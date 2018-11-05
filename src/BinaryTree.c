@@ -4,6 +4,7 @@
 #include "../include/Typedefs.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include <stdint.h>
 
 #define BCast(Tree) ((HBinaryTree)Tree)
@@ -131,6 +132,7 @@ BinaryTree newBinaryTreeHuffman(ArrayList symbolList)
 	}
 
 	symbols = getListSize(symbolList);
+	printf("%i\n", symbols);
 
 	for(i = 0; i < symbols - 1; i++)
 	{
@@ -155,7 +157,7 @@ static void PreOrder(TreeNode* root)
 		PreOrder(&((*root)->leftSon));
 		PreOrder(&((*root)->rightSon));
 
-		if(((Symbol)((*root)->data))->caracter == None)
+		if(((Symbol)((*root)->data))->caracter == None && ((Symbol)((*root)->data))->frequency != None)
 		{
 			printf("Caracter: %s | Frequency: %i\n", "None", ((Symbol)((*root)->data))->frequency);
 		}

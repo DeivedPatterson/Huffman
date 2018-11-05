@@ -26,22 +26,24 @@ int main(int argc, char const *argv[])
 	ArrayList symbolList;
 	BinaryTree treeHuffman;
 	char* buffer = NULL;
-	uint32_t n, i;
+	int32_t n, i;
 	char caracter;
 	int32_t frequency;
 
 	buffer = (char*)calloc(MAX_BUFFER_STRING, sizeof(char));
 	symbolList = newArrayList(-1);
-	fflush(stdin);
+
 	puts("Entre com o texto a ser compactado");
 	fgets(buffer, MAX_BUFFER_STRING, stdin);
 
 	puts("Entre com o tamanho da tabela");
-	scanf(" %i", &n);
-
+	scanf("%i", &n);
+	puts("Entre com cada simbolo e sua frequência");
 	for(i = 0; i < n; i++)
 	{
-		scanf("%c %i", &caracter, &frequency);
+		getchar();
+		scanf("%c", &caracter);
+		scanf("%i", &frequency);
 		insertSorted(symbolList, newSymbol(caracter, frequency), compare);
 	}
 
