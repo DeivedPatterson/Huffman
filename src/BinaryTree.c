@@ -4,35 +4,32 @@
 #include "../include/Typedefs.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 #define BCast(Tree) ((HBinaryTree)Tree)
 
-typedef struct Node
+typedef struct TreeNode
 {
-	Object leftSon;
-	Object rightSon;
-	int value;
-}*Node;
-
-typedef struct Leaf
-{
-	char caracter;
-	int frequency;
-}*Leaf;
+	struct TreeNode* leftSon;
+	struct TreeNode* rightSon;
+	Object data;
+}*TreeNode;
 
 typedef struct HBinaryTree
 {
-	Node* root;
+	TreeNode* root;
 	uint32_t nodes;
 }*HBinaryTree;
 
-static Node newNode(void);
-static Leaf newLeaf(char caracter, int frequency);
+static TreeNode newNode(Object data);
 static int compare(Object obj1, Object obj2);
 
 static int compare(Object obj1, Object obj2)
 {
+	TreeNode n1 = (TreeNode)obj1;
+	TreeNode n2 = (TreeNode)obj2;
 
+	return ((Symbol)(n1->data))->frequency - ((Symbol)(n2->data))->frequency;
 }
 
 BinaryTree newBinaryTree(void)
@@ -45,12 +42,16 @@ BinaryTree newBinaryTree(void)
 		tree = (HBinaryTree)malloc(sizeof(struct HBinaryTree));
 		if(tree != NULL)
 		{
-			tree->root = (Node*)malloc(sizeof(Node));
-			if(tree->root == NULL)
+			tree->root = (TreeNode*)malloc(sizeof(TreeNode));
+			if(tree->root != NULL)
+			{
+				*(tree->root) = NULL;
+				tree->nodes = 0;
+			}
+			else
 			{
 				throw(__MemoryAllocationException__);
 			}
-			tree->nodes = 0;
 		}
 	}
 	catch(MemoryAllocationException)
@@ -61,18 +62,18 @@ BinaryTree newBinaryTree(void)
 	return tree;
 }
 
-static Node newNode(void)
+static TreeNode newNode(Object data)
 {
-	Node new_node = NULL;
+	TreeNode new_node = NULL;
 
 	try
 	{
-		new_node = (Node)malloc(sizeof(struct Node));
+		new_node = (TreeNode)malloc(sizeof(struct TreeNode));
 		if(new_node != NULL)
 		{
 			new_node->leftSon = NULL;
 			new_node->rightSon = NULL;
-			new_node->value = None;
+			new_node->data = data;
 		}
 		else
 		{
@@ -87,31 +88,7 @@ static Node newNode(void)
 	return new_node;
 }
 
-static Leaf newLeaf(char caracter, int frequency)
-{
-	Leaf leaf = NULL;
-
-	try
-	{
-		leaf = (Leaf)malloc(sizeof(struct Leaf));
-		if(leaf != NULL)
-		{
-			leaf->caracter = caracter;
-			leaf->frequency = frequency;
-		}
-		else
-		{
-			throw(__MemoryAllocationException__);
-		}
-	}catch(MemoryAllocationException)
-	{
-
-	}
-
-	return leaf;
-}
-
-Symbol newSymbol(char caracter, int frequency)
+Symbol newSymbol(char caracter, int32_t frequency)
 {
 	Symbol symb = NULL;
 
@@ -140,28 +117,56 @@ BinaryTree newBinaryTreeHuffman(ArrayList symbolList)
 {
 	uint32_t symbols;
 	uint32_t i;
-	Node z;
-	Symbol x, y;
+	TreeNode x,y,z;
+	Symbol temp;
 	BinaryTree tree;
+	ArrayList nodeList;
 
 	tree = newBinaryTree();
+	nodeList = newArrayList(-1);
 
-	symbols = getListSize(symbols);
-	z = newNode();
+	foreach_ArrayList(temp, symbolList)
+	{
+		insertBottomList(nodeList, newNode(temp));
+	}
+
+	symbols = getListSize(symbolList);
 
 	for(i = 0; i < symbols - 1; i++)
 	{
-		x = removeTopList(symbolList);
-		y = removeTopList(symbolList);
+		z = newNode(newSymbol(None, None));
+		x = (TreeNode)removeTopList(nodeList);
+		y = (TreeNode)removeTopList(nodeList);
 		z->leftSon = x;
 		z->rightSon = y;
-		z->value = x->frequency + y->frequency;
-		insertSorted(symbolList, z, compare);
+		((Symbol)z->data)->frequency = ((Symbol)(x->data))->frequency + ((Symbol)(y->data))->frequency;
+		insertSorted(nodeList, z, compare);
 	}
 
-	BCast(tree)->root = removeTopList(symbolList);
+	*(BCast(tree)->root) = removeTopList(nodeList);
 
 	return tree;
 }
 
+static void PreOrder(TreeNode* root)
+{
+	if(*root != NULL)
+	{
+		PreOrder(&((*root)->leftSon));
+		PreOrder(&((*root)->rightSon));
 
+		if(((Symbol)((*root)->data))->caracter == None)
+		{
+			printf("Caracter: %s | Frequency: %i\n", "None", ((Symbol)((*root)->data))->frequency);
+		}
+		else
+		{
+			printf("Caracter: %c | Frequency: %i\n", ((Symbol)((*root)->data))->caracter, ((Symbol)((*root)->data))->frequency);
+		}
+	}
+}
+
+void PrintBinaryHuffmanPreOrder(BinaryTree tree)
+{
+	PreOrder(BCast(tree)->root);
+}
