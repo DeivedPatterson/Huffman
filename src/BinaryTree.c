@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <stdint.h>
+#include <math.h>
 
 #define BCast(Tree) ((HBinaryTree)Tree)
 
@@ -24,6 +25,8 @@ typedef struct HBinaryTree
 
 static TreeNode newNode(Object data);
 static int compare(Object obj1, Object obj2);
+static void PosOrder(TreeNode* root);
+
 
 static int compare(Object obj1, Object obj2)
 {
@@ -132,7 +135,6 @@ BinaryTree newBinaryTreeHuffman(ArrayList symbolList)
 	}
 
 	symbols = getListSize(symbolList);
-	printf("%i\n", symbols);
 
 	for(i = 0; i < symbols - 1; i++)
 	{
@@ -150,12 +152,12 @@ BinaryTree newBinaryTreeHuffman(ArrayList symbolList)
 	return tree;
 }
 
-static void PreOrder(TreeNode* root)
+static void PosOrder(TreeNode* root)
 {
 	if(*root != NULL)
 	{
-		PreOrder(&((*root)->leftSon));
-		PreOrder(&((*root)->rightSon));
+		PosOrder(&((*root)->leftSon));
+		PosOrder(&((*root)->rightSon));
 
 		if(((Symbol)((*root)->data))->caracter == None && ((Symbol)((*root)->data))->frequency != None)
 		{
@@ -168,7 +170,31 @@ static void PreOrder(TreeNode* root)
 	}
 }
 
-void PrintBinaryHuffmanPreOrder(BinaryTree tree)
+void PrintBinaryHuffmanPosOrder(BinaryTree tree)
 {
-	PreOrder(BCast(tree)->root);
+	PosOrder(BCast(tree)->root);
+}
+
+static uint32_t PreOrder(TreeNode* root, char caracter, uint32_t bit)
+{
+	static uint32_t code;
+
+	if((*root) != NULL) 
+	{
+		//code = (code << 1) | bit;
+		printf("%c %i\n", ((Symbol)((*root)->data))->caracter, bit);
+		PreOrder(&(*root)->leftSon, caracter, 0);
+		PreOrder(&(*root)->rightSon, caracter, 1);
+	}
+
+	return bit;
+}
+//DCCACADEACCCCCBCEBBBD
+uint32_t HuffmanCodec(BinaryTree tree, const char* txt)
+{
+	uint32_t i;
+
+	
+	PreOrder(BCast(tree)->root, 0, 0);
+	
 }

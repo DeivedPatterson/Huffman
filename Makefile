@@ -1,4 +1,4 @@
-OBJS = src/*.c
+OBJS = src/ArrayList.c src/BinaryTree.c src/main.c src/Exception.c
 CC = gcc
 OBJ_NAME = main
 

@@ -28,7 +28,8 @@ int main(int argc, char const *argv[])
 	char* buffer = NULL;
 	int32_t n, i;
 	char caracter;
-	int32_t frequency;
+	int32_t frequency = 0;
+
 
 	buffer = (char*)calloc(MAX_BUFFER_STRING, sizeof(char));
 	symbolList = newArrayList(-1);
@@ -48,7 +49,9 @@ int main(int argc, char const *argv[])
 	}
 
 	treeHuffman = newBinaryTreeHuffman(symbolList);
-	PrintBinaryHuffmanPreOrder(treeHuffman);
+
+	HuffmanCodec(treeHuffman, buffer);
+	//PrintBinaryHuffmanPosOrder(treeHuffman);
 
 	return 0;
 }

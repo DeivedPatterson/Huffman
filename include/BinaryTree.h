@@ -17,8 +17,8 @@ typedef struct Symbol
 BinaryTree newBinaryTreeHuffman(ArrayList symbolList);
 BinaryTree newBinaryTree(void);
 Symbol newSymbol(char caracter, int32_t frequency);
-void PrintBinaryHuffmanPreOrder(BinaryTree tree);
-
+void PrintBinaryHuffmanPosOrder(BinaryTree tree);
+uint32_t HuffmanCodec(BinaryTree tree, const char* txt);
 
 
 #endif
