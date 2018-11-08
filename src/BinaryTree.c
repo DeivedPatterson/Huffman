@@ -37,20 +37,6 @@ static int compare(Object obj1, Object obj2)
 	TreeNode n1 = (TreeNode)obj1;
 	TreeNode n2 = (TreeNode)obj2;
 
-	printf("n1: %i, n2: %i\n", ((Symbol)(n1->data))->frequency ,((Symbol)(n2->data))->frequency);
-
-	/*
-	if(((Symbol)(n2->data))->frequency > ((Symbol)(n1->data))->frequency)
-	{
-		return 1;
-	}
-	else if(((Symbol)(n2->data))->frequency < ((Symbol)(n1->data))->frequency)
-	{
-		return -1;
-	}
-	*/
-
-
 	return (((Symbol)(n1->data))->frequency - ((Symbol)(n2->data))->frequency);
 }
 
@@ -159,7 +145,7 @@ BinaryTree newBinaryTreeHuffman(ArrayList symbolList)
 
 	symbols = getListSize(symbolList);
 
-	for(i = 0; i < symbols - 1; i++)
+	for(i = 0; i < (symbols) - 1; i++)
 	{
 		z = newNode(newSymbol(None, 0));
 		x = (TreeNode)removeTopList(nodeList);
@@ -172,16 +158,10 @@ BinaryTree newBinaryTreeHuffman(ArrayList symbolList)
 		father = !father;
 		x->father = z;
 		y->father = z;
-		//printf("x: %i, y: %i\n", ((Symbol)(x->data))->frequency, ((Symbol)(y->data))->frequency);
 		((Symbol)z->data)->frequency = ((Symbol)(x->data))->frequency + ((Symbol)(y->data))->frequency;
 		insertSorted(nodeList, z, compare);
-
-		foreach_ArrayList(p, nodeList)
-		{
-			printf("%i ", ((Symbol)(p->data))->frequency);
-		}
-		puts(" ");
 	}
+
 
 	*(BCast(tree)->root) = removeTopList(nodeList);
 
@@ -252,7 +232,7 @@ ArrayList BuildTableSymbol(BinaryTree tree, ArrayList symbolList)
 	{	
 		z = removeTopList(leaves);
 		scroll = z->father;
-		//printf("%c", ((Symbol)((z)->data))->caracter);
+		printf("%c ", ((Symbol)((z)->data))->caracter);
 		p = 0;
 		while(scroll != NULL)
 		{

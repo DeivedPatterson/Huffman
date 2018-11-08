@@ -49,15 +49,10 @@ int main(int argc, char const *argv[])
 		insertSorted(symbolList, newSymbol(caracter, frequency), compare);
 	}
 
-	foreach_ArrayList(s, symbolList)
-	{
-		printf("Simbolo: %c , Frequencia %i\n", s->caracter, s->frequency);
-	}
-
 	treeHuffman = newBinaryTreeHuffman(symbolList);
 	//HuffmanCodec(treeHuffman, buffer);
-	//BuildTableSymbol(treeHuffman, symbolList);
-	PrintBinaryHuffmanPosOrder(treeHuffman);
+	BuildTableSymbol(treeHuffman, symbolList);
+	//PrintBinaryHuffmanPosOrder(treeHuffman);
 
 	return 0;
 }

@@ -438,7 +438,6 @@ void insertSorted(ArrayList list, Object data, FunctionCompare compare)
 
 						while((scroll != NULL) && compare(data, scroll->data) > 0)
 						{
-							puts("Dd");
 							previousNode = scroll;
 							scroll = scroll->next;
 						}
