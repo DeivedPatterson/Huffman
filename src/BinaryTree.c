@@ -14,7 +14,11 @@ typedef struct TreeNode
 {
 	struct TreeNode* leftSon;
 	struct TreeNode* rightSon;
+	struct TreeNode* father;
 	Object data;
+	uint32_t edgeLeft;
+	uint32_t edgeRight;
+	uint32_t edgeFather;
 }*TreeNode;
 
 typedef struct HBinaryTree
@@ -26,14 +30,28 @@ typedef struct HBinaryTree
 static TreeNode newNode(Object data);
 static int compare(Object obj1, Object obj2);
 static void PosOrder(TreeNode* root);
-
+static void PreOrder(TreeNode* root, ArrayList list);
 
 static int compare(Object obj1, Object obj2)
 {
 	TreeNode n1 = (TreeNode)obj1;
 	TreeNode n2 = (TreeNode)obj2;
 
-	return ((Symbol)(n1->data))->frequency - ((Symbol)(n2->data))->frequency;
+	printf("n1: %i, n2: %i\n", ((Symbol)(n1->data))->frequency ,((Symbol)(n2->data))->frequency);
+
+	/*
+	if(((Symbol)(n2->data))->frequency > ((Symbol)(n1->data))->frequency)
+	{
+		return 1;
+	}
+	else if(((Symbol)(n2->data))->frequency < ((Symbol)(n1->data))->frequency)
+	{
+		return -1;
+	}
+	*/
+
+
+	return (((Symbol)(n1->data))->frequency - ((Symbol)(n2->data))->frequency);
 }
 
 BinaryTree newBinaryTree(void)
@@ -77,7 +95,10 @@ static TreeNode newNode(Object data)
 		{
 			new_node->leftSon = NULL;
 			new_node->rightSon = NULL;
+			new_node->father = NULL;
 			new_node->data = data;
+			new_node->edgeLeft = 0;
+			new_node->edgeRight = 0;
 		}
 		else
 		{
@@ -122,12 +143,14 @@ BinaryTree newBinaryTreeHuffman(ArrayList symbolList)
 	uint32_t symbols;
 	uint32_t i;
 	TreeNode x,y,z;
+	TreeNode p;
 	Symbol temp;
 	BinaryTree tree;
 	ArrayList nodeList;
+	bool father = true;
 
 	tree = newBinaryTree();
-	nodeList = newArrayList(-1);
+	nodeList = newArrayList(INFINITE);
 
 	foreach_ArrayList(temp, symbolList)
 	{
@@ -138,13 +161,26 @@ BinaryTree newBinaryTreeHuffman(ArrayList symbolList)
 
 	for(i = 0; i < symbols - 1; i++)
 	{
-		z = newNode(newSymbol(None, None));
+		z = newNode(newSymbol(None, 0));
 		x = (TreeNode)removeTopList(nodeList);
 		y = (TreeNode)removeTopList(nodeList);
+		z->edgeLeft = 0;
+		z->edgeRight = 1;
 		z->leftSon = x;
 		z->rightSon = y;
+		z->edgeFather = !father;
+		father = !father;
+		x->father = z;
+		y->father = z;
+		//printf("x: %i, y: %i\n", ((Symbol)(x->data))->frequency, ((Symbol)(y->data))->frequency);
 		((Symbol)z->data)->frequency = ((Symbol)(x->data))->frequency + ((Symbol)(y->data))->frequency;
 		insertSorted(nodeList, z, compare);
+
+		foreach_ArrayList(p, nodeList)
+		{
+			printf("%i ", ((Symbol)(p->data))->frequency);
+		}
+		puts(" ");
 	}
 
 	*(BCast(tree)->root) = removeTopList(nodeList);
@@ -161,7 +197,7 @@ static void PosOrder(TreeNode* root)
 
 		if(((Symbol)((*root)->data))->caracter == None && ((Symbol)((*root)->data))->frequency != None)
 		{
-			printf("Caracter: %s | Frequency: %i\n", "None", ((Symbol)((*root)->data))->frequency);
+		 	printf("Caracter: %s | Frequency: %i\n", "None", ((Symbol)((*root)->data))->frequency);
 		}
 		else
 		{
@@ -175,19 +211,19 @@ void PrintBinaryHuffmanPosOrder(BinaryTree tree)
 	PosOrder(BCast(tree)->root);
 }
 
-static uint32_t PreOrder(TreeNode* root, char caracter, uint32_t bit)
+static void PreOrder(TreeNode* root, ArrayList list)
 {
-	static uint32_t code;
 
-	if((*root) != NULL) 
+	if((*root)->leftSon != NULL && (*root)->rightSon != NULL) 
 	{
-		//code = (code << 1) | bit;
-		printf("%c %i\n", ((Symbol)((*root)->data))->caracter, bit);
-		PreOrder(&(*root)->leftSon, caracter, 0);
-		PreOrder(&(*root)->rightSon, caracter, 1);
+		printf("Direita %i, Esquerda %i, frequency %i\n", (*root)->edgeLeft, (*root)->edgeRight, ((Symbol)((*root)->data))->frequency);
+		PreOrder(&(*root)->leftSon, list);
+		PreOrder(&(*root)->rightSon, list);
 	}
-
-	return bit;
+	else
+	{
+		insertSorted(list, *root, compare);
+	}
 }
 //DCCACADEACCCCCBCEBBBD
 uint32_t HuffmanCodec(BinaryTree tree, const char* txt)
@@ -195,6 +231,35 @@ uint32_t HuffmanCodec(BinaryTree tree, const char* txt)
 	uint32_t i;
 
 	
-	PreOrder(BCast(tree)->root, 0, 0);
-	
+}
+
+ArrayList BuildTableSymbol(BinaryTree tree, ArrayList symbolList)
+{
+	ArrayList leaves;
+	TreeNode z;
+	Symbol s;
+	TreeNode scroll;
+	uint32_t p = 0;
+	uint32_t i;
+	uint32_t size;
+
+	leaves = newArrayList(INFINITE);
+
+	PreOrder(BCast(tree)->root, leaves);
+
+	size = getListSize(leaves);
+	while(not isEmpty(leaves))
+	{	
+		z = removeTopList(leaves);
+		scroll = z->father;
+		//printf("%c", ((Symbol)((z)->data))->caracter);
+		p = 0;
+		while(scroll != NULL)
+		{
+			//printf("%i ", ((Symbol)((scroll)->data))->frequency);
+			p = (p << 1) | scroll->edgeFather;
+			scroll = scroll->father;
+		}
+		printf("%i\n", p);
+	}
 }

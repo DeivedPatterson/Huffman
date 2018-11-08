@@ -418,7 +418,7 @@ void insertSorted(ArrayList list, Object data, FunctionCompare compare)
 						*GetListHead(list) = newNode;
 						*GetListEnd(list) = newNode;
 					}
-					else if((*GetListHead(list) != NULL) && (compare(data,(*GetListHead(list))->data) < 0)) 
+					else if((*GetListHead(list) != NULL) && (compare(data, (*GetListHead(list))->data) < 0)) 
 					{			
 						newNode->next = *GetListHead(list);
 						newNode->previous = NULL;
@@ -436,8 +436,9 @@ void insertSorted(ArrayList list, Object data, FunctionCompare compare)
 					{
 						scroll = *GetListHead(list);
 
-						while((scroll != NULL) && (compare(scroll->data, data) < 0))
+						while((scroll != NULL) && compare(data, scroll->data) > 0)
 						{
+							puts("Dd");
 							previousNode = scroll;
 							scroll = scroll->next;
 						}

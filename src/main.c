@@ -29,6 +29,7 @@ int main(int argc, char const *argv[])
 	int32_t n, i;
 	char caracter;
 	int32_t frequency = 0;
+	Symbol s;
 
 
 	buffer = (char*)calloc(MAX_BUFFER_STRING, sizeof(char));
@@ -48,10 +49,15 @@ int main(int argc, char const *argv[])
 		insertSorted(symbolList, newSymbol(caracter, frequency), compare);
 	}
 
-	treeHuffman = newBinaryTreeHuffman(symbolList);
+	foreach_ArrayList(s, symbolList)
+	{
+		printf("Simbolo: %c , Frequencia %i\n", s->caracter, s->frequency);
+	}
 
-	HuffmanCodec(treeHuffman, buffer);
-	//PrintBinaryHuffmanPosOrder(treeHuffman);
+	treeHuffman = newBinaryTreeHuffman(symbolList);
+	//HuffmanCodec(treeHuffman, buffer);
+	//BuildTableSymbol(treeHuffman, symbolList);
+	PrintBinaryHuffmanPosOrder(treeHuffman);
 
 	return 0;
 }

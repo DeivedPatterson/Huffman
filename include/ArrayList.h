@@ -21,6 +21,8 @@
 
 #define not !
 
+#define INFINITE -1
+
 typedef struct Node
 {
 	struct Node* next;
