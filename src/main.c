@@ -3,56 +3,39 @@
 #include "../include/ArrayList.h"
 #include "../include/Typedefs.h"
 #include "../include/BinaryTree.h"
+#include "../include/Exception.h"
 #include <stdint.h>
 
 #define MAX_BUFFER_STRING 	4096L
 
-
-static int compare(Object obj1, Object obj2);
-
-
-
-
-static int compare(Object obj1, Object obj2)
-{
-	Symbol s1 = (Symbol)obj1;
-	Symbol s2 = (Symbol)obj2;
-
-	return s1->frequency - s2->frequency;
-}
-
 int main(int argc, char const *argv[])
 {
 	ArrayList symbolList;
+	ArrayList symbolCode;
 	BinaryTree treeHuffman;
 	char* buffer = NULL;
-	int32_t n, i;
-	char caracter;
-	int32_t frequency = 0;
-	Symbol s;
+	char size[10];
+	uint32_t textSize;
+	FILE* input;
+
 
 
 	buffer = (char*)calloc(MAX_BUFFER_STRING, sizeof(char));
 	symbolList = newArrayList(-1);
 
-	puts("Entre com o texto a ser compactado");
-	fgets(buffer, MAX_BUFFER_STRING, stdin);
+	FileOpen(input, "text.txt", "r");
+	fgets(buffer, MAX_BUFFER_STRING, input);
+	printf("%s\n", buffer);
 
-	puts("Entre com o tamanho da tabela");
-	scanf("%i", &n);
-	puts("Entre com cada simbolo e sua frequência");
-	for(i = 0; i < n; i++)
-	{
-		getchar();
-		scanf("%c", &caracter);
-		scanf("%i", &frequency);
-		insertSorted(symbolList, newSymbol(caracter, frequency), compare);
-	}
+
+	symbolList = BuildFrequencyTable(buffer);
 
 	treeHuffman = newBinaryTreeHuffman(symbolList);
-	//HuffmanCodec(treeHuffman, buffer);
-	BuildTableSymbol(treeHuffman, symbolList);
-	//PrintBinaryHuffmanPosOrder(treeHuffman);
-
+	symbolCode = BuildSymbolTable(treeHuffman);
+	HuffmanCodec(symbolCode, buffer);
+	#ifdef DEBUG_ON
+	PrintBinaryHuffmanPosOrder(treeHuffman);
+	#endif
+	
 	return 0;
 }

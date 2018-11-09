@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "Exception.h"
+#include <stdint.h>
+
 
 #define foreachFile(addressOut,file) 		           						\
  																			\
@@ -24,6 +26,9 @@
 #define foreachVectorWithN(addressOut,vector,n)								\
 	for(int i = 0; i < n; addressOut = vector[i], i++)
 
+
+
+void ToBinary(uint32_t num, char* vect);
 
 
 

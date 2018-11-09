@@ -2,9 +2,11 @@
 #include "../include/Exception.h"
 #include "../include/ArrayList.h"
 #include "../include/Typedefs.h"
+#include "../include/Ultility.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <string.h>
 #include <stdint.h>
 #include <math.h>
 
@@ -31,6 +33,7 @@ static TreeNode newNode(Object data);
 static int compare(Object obj1, Object obj2);
 static void PosOrder(TreeNode* root);
 static void PreOrder(TreeNode* root, ArrayList list);
+static void BuildTable(TreeNode* root, const ArrayList table, uint32_t w);
 
 static int compare(Object obj1, Object obj2)
 {
@@ -38,6 +41,14 @@ static int compare(Object obj1, Object obj2)
 	TreeNode n2 = (TreeNode)obj2;
 
 	return (((Symbol)(n1->data))->frequency - ((Symbol)(n2->data))->frequency);
+}
+
+static int compareSymbol(Object obj1, Object obj2)
+{
+	Symbol s1 = (Symbol)obj1;
+	Symbol s2 = (Symbol)obj2;
+
+	return s1->frequency - s2->frequency;
 }
 
 BinaryTree newBinaryTree(void)
@@ -124,6 +135,31 @@ Symbol newSymbol(char caracter, int32_t frequency)
 	return symb;
 }
 
+static SymbolCode newSymbolCode(char caracter, uint32_t code)
+{
+	SymbolCode symbCode = NULL;
+
+	try
+	{
+		symbCode = (SymbolCode)malloc(sizeof(struct SymbolCode));
+		if(symbCode != NULL)
+		{
+			symbCode->caracter = caracter;
+			symbCode->code = code;
+		}
+		else
+		{
+			throw(__MemoryAllocationException__);
+		}
+	}
+	catch(MemoryAllocationException)
+	{
+
+	}
+
+	return symbCode;
+}
+
 BinaryTree newBinaryTreeHuffman(ArrayList symbolList)
 {
 	uint32_t symbols;
@@ -205,41 +241,108 @@ static void PreOrder(TreeNode* root, ArrayList list)
 		insertSorted(list, *root, compare);
 	}
 }
-//DCCACADEACCCCCBCEBBBD
-uint32_t HuffmanCodec(BinaryTree tree, const char* txt)
-{
-	uint32_t i;
 
-	
+void HuffmanCodec(ArrayList table, const char* txt)
+{
+	int i;
+	SymbolCode symbCode;
+	char v[10];
+
+	for(i = 0; isgraph(txt[i]) != 0; i++)
+	{
+		foreach_ArrayList(symbCode, table)
+		{
+			if(symbCode->caracter == txt[i])
+			{
+				ToBinary(symbCode->code, v);
+				printf("%s", v);
+				memset(v, 0, 10);
+			}
+		}
+	}
+	puts(" ");
 }
 
-ArrayList BuildTableSymbol(BinaryTree tree, ArrayList symbolList)
+static void BuildTable(TreeNode* root, const ArrayList table, uint32_t w)
 {
-	ArrayList leaves;
-	TreeNode z;
-	Symbol s;
-	TreeNode scroll;
-	uint32_t p = 0;
-	uint32_t i;
-	uint32_t size;
 
-	leaves = newArrayList(INFINITE);
+	if((*root)->leftSon == NULL && (*root)->rightSon == NULL)
+	{
+		char caracter;
 
-	PreOrder(BCast(tree)->root, leaves);
+		caracter = ((Symbol)((*root)->data))->caracter;
+		insertBottomList(table, newSymbolCode(caracter, w));
 
-	size = getListSize(leaves);
-	while(not isEmpty(leaves))
-	{	
-		z = removeTopList(leaves);
-		scroll = z->father;
-		printf("%c ", ((Symbol)((z)->data))->caracter);
-		p = 0;
-		while(scroll != NULL)
-		{
-			//printf("%i ", ((Symbol)((scroll)->data))->frequency);
-			p = (p << 1) | scroll->edgeFather;
-			scroll = scroll->father;
-		}
-		printf("%i\n", p);
+		return;
 	}
+
+	BuildTable(&(*root)->leftSon, table, (w << 1) | false );
+	BuildTable(&(*root)->rightSon, table, (w << 1) | true );
+}
+
+ArrayList BuildSymbolTable(BinaryTree tree)
+{
+	ArrayList table;
+	SymbolCode symbCode;
+	char v[10];
+
+	table = newArrayList(INFINITE);
+
+	BuildTable(BCast(tree)->root, table, 0);
+
+	#ifdef DEBUG_ON
+	foreach_ArrayList(symbCode, table)
+	{
+		ToBinary(symbCode->code, v);
+		printf("caracter: %c code: %s\n", symbCode->caracter, v);
+	}
+	#endif
+	
+	return table;
+}
+
+ArrayList BuildFrequencyTable(const char* txt)
+{
+	uint32_t i, j, k;
+	char caracter;
+	int32_t frequency;
+	ArrayList fTable;
+	char* mark;
+	uint32_t size;
+	bool isMark = false;
+
+	fTable = newArrayList(INFINITE);
+	size = strlen(txt) + 1;
+	mark = (char*)calloc(size, sizeof(char));
+
+	for(i = 0; isgraph(txt[i]) != 0; i++)
+	{
+		frequency = 0;
+		for(k = 0; k < size; k++)
+		{
+			if(txt[i] == mark[k])
+			{
+				isMark = true;
+			}
+		}
+		
+		if(!isMark)
+		{
+			for(j = 0; isgraph(txt[j]) != 0; j++)
+			{
+				if(txt[i] == txt[j])
+				{
+					mark[i] = txt[i];
+					frequency += 1;
+				}
+			}
+			caracter = txt[i];
+			insertSorted(fTable, newSymbol(caracter, frequency), compareSymbol);
+		}
+
+		isMark = false;
+		
+	}
+
+	return fTable;
 }

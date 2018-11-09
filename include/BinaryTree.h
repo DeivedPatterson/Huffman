@@ -13,13 +13,18 @@ typedef struct Symbol
 	int32_t frequency;
 }*Symbol;
 
+typedef struct SymbolCode
+{
+	char caracter;
+	uint32_t code;
+}*SymbolCode;
 
 BinaryTree newBinaryTreeHuffman(ArrayList symbolList);
-ArrayList BuildTableSymbol(BinaryTree tree, ArrayList symbolList);
+ArrayList BuildSymbolTable(BinaryTree tree);
 BinaryTree newBinaryTree(void);
 Symbol newSymbol(char caracter, int32_t frequency);
 void PrintBinaryHuffmanPosOrder(BinaryTree tree);
-uint32_t HuffmanCodec(BinaryTree tree, const char* txt);
-
+void HuffmanCodec(ArrayList table, const char* txt);
+ArrayList BuildFrequencyTable(const char* txt);
 
 #endif
